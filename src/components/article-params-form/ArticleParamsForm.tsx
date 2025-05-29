@@ -28,13 +28,13 @@ type ArticleParamsFormProps = {
 
 export const ArticleParamsForm = ({ articleState }: ArticleParamsFormProps) => {
 	const formReF = useRef<HTMLFormElement>(null);
-	const [isOpen, setIsOpen] = useState(false);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [formState, setFormState] = useState(defaultArticleState);
 
 	const handleSubmit = (event: React.FocusEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		articleState(formState);
-		setIsOpen(false);
+		setIsMenuOpen(false);
 	};
 
 	const handleReset = () => {
@@ -43,15 +43,17 @@ export const ArticleParamsForm = ({ articleState }: ArticleParamsFormProps) => {
 	};
 
 	useEffect(() => {
+		if (!isMenuOpen) return;
+
 		const handleEsc = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
-				setIsOpen(false);
+				setIsMenuOpen(false);
 			}
 		};
 
 		const handleClickOutside = (event: MouseEvent) => {
 			if (formReF.current && !formReF.current.contains(event.target as Node)) {
-				setIsOpen(false);
+				setIsMenuOpen(false);
 			}
 		};
 
@@ -62,7 +64,7 @@ export const ArticleParamsForm = ({ articleState }: ArticleParamsFormProps) => {
 			document.removeEventListener('keydown', handleEsc);
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
-	}, [isOpen]);
+	}, [isMenuOpen]);
 
 	const handleChangeFontFamily = (item: OptionType) => {
 		setFormState({
@@ -101,10 +103,15 @@ export const ArticleParamsForm = ({ articleState }: ArticleParamsFormProps) => {
 
 	return (
 		<>
-			<ArrowButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
+			<ArrowButton
+				isOpen={isMenuOpen}
+				onClick={() => setIsMenuOpen(!isMenuOpen)}
+			/>
 
 			<aside
-				className={clsx(styles.container, { [styles.container_open]: isOpen })}>
+				className={clsx(styles.container, {
+					[styles.container_open]: isMenuOpen,
+				})}>
 				<form
 					className={styles.form}
 					ref={formReF}
